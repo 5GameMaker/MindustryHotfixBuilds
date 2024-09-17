@@ -1,0 +1,33 @@
+name: Build Artifacts
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    - name: Create artifacts
+      run: |
+        git clone --depth=1 --branch=master https://github.com/Anuken/Mindustry
+        cd Mindustry
+        echo "BODY=$(git rev-parse HEAD)" >> $GITHUB_ENV
+        sed -i 's/applicationId "io.anuke.mindustry"/applicationId "io.anuke.mindustry.bex"/g' android/build.gradle
+        sed -i 's/"io.anuke.mindustry"/"io.anuke.mindustry.bex"/g' android/AndroidManifest.xml
+        sed -i 's/Mindustry/Mindustry BE (Hotfix)/g' android/res/values/strings.xml
+        #./gradlew pack
+        ./gradlew server:dist -Pbuildversion=146 -PversionType=bleeding-edge
+    - name: Upload server artifacts
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: Mindustry/server/build/libs/Mindustry-BE-Server-${{ env.RELEASE_VERSION }}.jar
