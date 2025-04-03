@@ -25,8 +25,8 @@ jobs:
         sed -i 's/applicationId "io.anuke.mindustry"/applicationId "io.anuke.mindustry.bex"/g' android/build.gradle
         sed -i 's/"io.anuke.mindustry"/"io.anuke.mindustry.bex"/g' android/AndroidManifest.xml
         sed -i 's/Mindustry/Mindustry Hotfix BE/g' android/res/values/strings.xml
-        #./gradlew pack
-        ./gradlew server:dist -Pbuildversion=146 -PversionType=bleeding-edge
+        ./gradlew tools:pack --info
+        ./gradlew server:dist -Pbuildversion=146 -PversionType=bleeding-edge --info
     - name: Upload server artifacts
       uses: svenstaro/upload-release-action@v2
       with:
